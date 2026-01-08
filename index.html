@@ -12,11 +12,15 @@
       window.OneSignalDeferred = window.OneSignalDeferred || [];
       OneSignalDeferred.push(async function(OneSignal) {
         await OneSignal.init({
-          appId: "7372b823-ccfc-4814-a5c8-0f8c231a6b38", // Teu App ID
-          safari_web_id: "web.onesignal.auto.64337d6b-67cd-4296-b41c-d41bc6b4a874", // Teu Safari ID
+          appId: "7372b823-ccfc-4814-a5c8-0f8c231a6b38",
+          safari_web_id: "web.onesignal.auto.64337d6b-67cd-4296-b41c-d41bc6b4a874",
+          // Ocultamos o botão padrão para usar o nosso botão verde personalizado
+          notifyButton: {
+            enable: false, 
+          },
         });
 
-        // Função para atualizar o botão se já estiver inscrito
+        // Quando a pessoa se inscreve, mudamos o texto
         OneSignal.User.PushSubscription.addEventListener("change", function(event) {
             if (event.current.optedIn) {
                 document.getElementById("status-texto").innerText = "Notificações Ativadas com Sucesso!";
@@ -26,7 +30,7 @@
         });
       });
 
-      // Função chamada ao clicar no botão
+      // Ação do nosso botão verde
       function ativarNotificacoes() {
         window.OneSignalDeferred.push(async function(OneSignal) {
             await OneSignal.User.PushSubscription.optIn();
@@ -37,20 +41,20 @@
     <style>
         body {
             font-family: 'Poppins', sans-serif;
-            background-color: #f4fdf4; /* Fundo muito levemente esverdeado */
+            background-color: #f4fdf4;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             margin: 0;
             text-align: center;
-            color: #2E7D32; /* Verde Escuro (Educação) */
+            color: #2E7D32;
         }
         .container {
             background: white;
             padding: 50px;
             border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(46, 125, 50, 0.15); /* Sombra verde suave */
+            box-shadow: 0 10px 25px rgba(46, 125, 50, 0.15);
             max-width: 400px;
             width: 90%;
         }
@@ -60,18 +64,10 @@
             display: block;
             animation: balancar 2s infinite ease-in-out;
         }
-        h1 {
-            font-weight: 600;
-            margin-bottom: 10px;
-            font-size: 24px;
-        }
-        p {
-            font-weight: 400;
-            margin-bottom: 30px;
-            color: #555; /* Cinza para leitura fácil */
-        }
+        h1 { font-weight: 600; margin-bottom: 10px; font-size: 24px; }
+        p { font-weight: 400; margin-bottom: 30px; color: #555; }
         .btn {
-            background-color: #2E7D32; /* Verde Principal */
+            background-color: #2E7D32;
             color: white;
             border: none;
             padding: 15px 30px;
@@ -79,22 +75,12 @@
             font-family: 'Poppins', sans-serif;
             border-radius: 50px;
             cursor: pointer;
-            transition: transform 0.2s, background-color 0.2s;
             text-decoration: none;
             display: inline-block;
             font-weight: 600;
         }
-        .btn:hover {
-            background-color: #1B5E20; /* Verde mais escuro ao passar o mouse */
-            transform: scale(1.05);
-        }
-        /* Botão de voltar (inicialmente escondido) */
-        #btn-voltar {
-            display: none;
-            background-color: #4CAF50;
-        }
-
-        /* Animação suave do sino */
+        .btn:hover { background-color: #1B5E20; transform: scale(1.05); }
+        #btn-voltar { display: none; background-color: #4CAF50; }
         @keyframes balancar {
             0% { transform: rotate(0deg); }
             10% { transform: rotate(10deg); }
@@ -107,16 +93,12 @@
     </style>
 </head>
 <body>
-
     <div class="container">
         <span class="emoji-sino">🔔</span>
         <h1 id="status-texto">Ativar Notificações</h1>
-        <p>Receba as novidades da <strong>Educação Orindiuva</strong> diretamente no seu dispositivo.</p>
-        
+        <p>Receba as novidades da <strong>Educação Orindiuva</strong>.</p>
         <button id="btn-ativar" class="btn" onclick="ativarNotificacoes()">Confirmar Inscrição</button>
-        
         <a id="btn-voltar" class="btn" href="https://www.educacao-orindiuva.com/">Voltar para o Site</a>
     </div>
-
 </body>
 </html>
