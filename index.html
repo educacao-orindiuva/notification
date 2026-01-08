@@ -1,104 +1,61 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Notificações - Educação Orindiuva</title>
+    <title>Notificações Educação</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-
     <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
     <script>
       window.OneSignalDeferred = window.OneSignalDeferred || [];
       OneSignalDeferred.push(async function(OneSignal) {
         await OneSignal.init({
-          appId: "7372b823-ccfc-4814-a5c8-0f8c231a6b38",
-          safari_web_id: "web.onesignal.auto.64337d6b-67cd-4296-b41c-d41bc6b4a874",
-          // Ocultamos o botão padrão para usar o nosso botão verde personalizado
+          appId: "46cd0741-ba50-4de8-8648-a92336f6bcc2", // O teu ID
           notifyButton: {
-            enable: false, 
+            enable: true, /* Ativa o sino no canto inferior direito */
+            size: 'medium',
+            theme: 'default',
+            position: 'bottom-right',
+            showCredit: false
           },
-        });
-
-        // Quando a pessoa se inscreve, mudamos o texto
-        OneSignal.User.PushSubscription.addEventListener("change", function(event) {
-            if (event.current.optedIn) {
-                document.getElementById("status-texto").innerText = "Notificações Ativadas com Sucesso!";
-                document.getElementById("btn-ativar").style.display = "none";
-                document.getElementById("btn-voltar").style.display = "inline-block";
-            }
+          allowLocalhostAsSecureOrigin: true,
         });
       });
-
-      // Ação do nosso botão verde
-      function ativarNotificacoes() {
-        window.OneSignalDeferred.push(async function(OneSignal) {
-            await OneSignal.User.PushSubscription.optIn();
-        });
-      }
     </script>
 
     <style>
         body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #f4fdf4;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
+            justify-content: center;
             height: 100vh;
             margin: 0;
+            background-color: #f4f6f8;
+            color: #333;
             text-align: center;
-            color: #2E7D32;
         }
-        .container {
+        .card {
             background: white;
-            padding: 50px;
-            border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(46, 125, 50, 0.15);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
             max-width: 400px;
             width: 90%;
         }
-        .emoji-sino {
-            font-size: 80px;
-            margin-bottom: 20px;
-            display: block;
-            animation: balancar 2s infinite ease-in-out;
-        }
-        h1 { font-weight: 600; margin-bottom: 10px; font-size: 24px; }
-        p { font-weight: 400; margin-bottom: 30px; color: #555; }
-        .btn {
-            background-color: #2E7D32;
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            font-size: 16px;
-            font-family: 'Poppins', sans-serif;
-            border-radius: 50px;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-block;
-            font-weight: 600;
-        }
-        .btn:hover { background-color: #1B5E20; transform: scale(1.05); }
-        #btn-voltar { display: none; background-color: #4CAF50; }
-        @keyframes balancar {
-            0% { transform: rotate(0deg); }
-            10% { transform: rotate(10deg); }
-            20% { transform: rotate(-10deg); }
-            30% { transform: rotate(6deg); }
-            40% { transform: rotate(-6deg); }
-            50% { transform: rotate(0deg); }
-            100% { transform: rotate(0deg); }
-        }
+        h1 { font-size: 1.4rem; color: #007bff; margin-bottom: 10px; }
+        p { margin-bottom: 20px; line-height: 1.5; color: #555; }
+        .icon { font-size: 3rem; margin-bottom: 15px; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <span class="emoji-sino">🔔</span>
-        <h1 id="status-texto">Ativar Notificações</h1>
-        <p>Receba as novidades da <strong>Educação Orindiuva</strong>.</p>
-        <button id="btn-ativar" class="btn" onclick="ativarNotificacoes()">Confirmar Inscrição</button>
-        <a id="btn-voltar" class="btn" href="https://www.educacao-orindiuva.com/">Voltar para o Site</a>
+
+    <div class="card">
+        <div class="icon">📢</div>
+        <h1>Central de Notificações</h1>
+        <p>Para receber avisos importantes da Educação, clique no <strong>sino vermelho/branco</strong> no canto do ecrã e selecione <strong>"Inscrever-se"</strong>.</p>
     </div>
+
 </body>
 </html>
