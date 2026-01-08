@@ -3,98 +3,119 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Notificações Educação</title>
+    <title>Gerir Notificações - Educação</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 
     <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
     <script>
       window.OneSignalDeferred = window.OneSignalDeferred || [];
+      
       OneSignalDeferred.push(async function(OneSignal) {
         await OneSignal.init({
           appId: "46cd0741-ba50-4de8-8648-a92336f6bcc2",
-          notifyButton: {
-            enable: false, /* Desativamos o sino padrão pois já temos o nosso */
-          },
+          notifyButton: { enable: false }, // Botão nativo desligado
           allowLocalhostAsSecureOrigin: true,
         });
 
-        // Verifica se o usuário já está inscrito ao carregar a página
-        if (OneSignal.User.PushSubscription.optedIn) {
-            atualizarParaInscrito();
-        }
+        // 1. Verifica o estado inicial ao carregar a página
+        atualizarVisual(OneSignal.User.PushSubscription.optedIn);
 
-        // Fica ouvindo mudanças: se a pessoa aceitar, muda a tela automaticamente
+        // 2. Fica a ouvir mudanças (se a pessoa ativar ou desativar)
         OneSignal.User.PushSubscription.addEventListener("change", function(event) {
-            if (event.current.optedIn) {
-                atualizarParaInscrito();
-            }
+            atualizarVisual(event.current.optedIn);
         });
       });
 
-      // Função chamada ao clicar no botão verde
-      function ativarNotificacoes() {
+      // Função para ATIVAR
+      function ativar() {
         window.OneSignalDeferred.push(async function(OneSignal) {
             await OneSignal.Slidedown.promptPush();
         });
       }
 
-      // Função que muda o visual quando está inscrito
-      function atualizarParaInscrito() {
-        document.getElementById("status-texto").innerText = "Notificações Ativadas!";
-        document.getElementById("status-desc").innerText = "Obrigado! Agora você receberá todos os avisos importantes.";
-        document.getElementById("btn-ativar").style.display = "none"; // Esconde botão ativar
-        document.getElementById("btn-voltar").style.display = "inline-block"; // Mostra botão voltar
-        document.querySelector(".emoji-sino").innerText = "✅"; // Muda sino para check
-        document.querySelector(".emoji-sino").style.animation = "none"; // Para a animação
+      // Função para DESATIVAR
+      function desativar() {
+        window.OneSignalDeferred.push(async function(OneSignal) {
+            await OneSignal.User.PushSubscription.optOut();
+        });
+      }
+
+      // Função que controla o design da página (Sino ou Check)
+      function atualizarVisual(estaInscrito) {
+        const sino = document.querySelector(".emoji-sino");
+        const titulo = document.getElementById("status-texto");
+        const desc = document.getElementById("status-desc");
+        const btnAtivar = document.getElementById("btn-ativar");
+        const btnDesativar = document.getElementById("btn-desativar");
+
+        if (estaInscrito) {
+            // MODO: JÁ INSCRITO
+            sino.innerText = "✅";
+            sino.style.animation = "none";
+            titulo.innerText = "Notificações Ativas!";
+            titulo.style.color = "#2E7D32";
+            desc.innerText = "Você já está recebendo as novidades da Educação.";
+            
+            btnAtivar.style.display = "none";     // Esconde botão verde
+            btnDesativar.style.display = "inline-block"; // Mostra botão vermelho
+        } else {
+            // MODO: NÃO INSCRITO
+            sino.innerText = "🔔";
+            sino.style.animation = "balancar 2s infinite ease-in-out";
+            titulo.innerText = "Ativar Notificações";
+            titulo.style.color = "#333";
+            desc.innerText = "Receba as novidades da Educação Orindiuva no seu dispositivo.";
+            
+            btnAtivar.style.display = "inline-block"; // Mostra botão verde
+            btnDesativar.style.display = "none";      // Esconde botão vermelho
+        }
       }
     </script>
 
     <style>
         body {
             font-family: 'Poppins', sans-serif;
-            background-color: #f4fdf4; /* Fundo muito levemente esverdeado */
+            background-color: #f4fdf4;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             margin: 0;
             text-align: center;
-            color: #2E7D32; /* Verde Escuro (Educação) */
+            color: #2E7D32;
         }
         .container {
             background: white;
-            padding: 50px;
+            padding: 40px;
             border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(46, 125, 50, 0.15); /* Sombra verde suave */
+            box-shadow: 0 10px 25px rgba(46, 125, 50, 0.15);
             max-width: 400px;
             width: 90%;
+            transition: all 0.3s ease;
         }
         .emoji-sino {
-            font-size: 80px;
-            margin-bottom: 20px;
+            font-size: 70px;
+            margin-bottom: 15px;
             display: block;
-            animation: balancar 2s infinite ease-in-out;
             cursor: default;
         }
         h1 {
             font-weight: 600;
             margin-bottom: 10px;
-            font-size: 24px;
+            font-size: 22px;
         }
         p {
             font-weight: 400;
             margin-bottom: 30px;
-            color: #555; /* Cinza para leitura fácil */
+            color: #666;
             font-size: 14px;
-            line-height: 1.6;
+            line-height: 1.5;
         }
         .btn {
-            background-color: #2E7D32; /* Verde Principal */
-            color: white;
             border: none;
-            padding: 15px 30px;
-            font-size: 16px;
+            padding: 12px 25px;
+            font-size: 15px;
             font-family: 'Poppins', sans-serif;
             border-radius: 50px;
             cursor: pointer;
@@ -102,18 +123,36 @@
             text-decoration: none;
             display: inline-block;
             font-weight: 600;
+            margin: 5px;
+            width: 100%; /* Botões ocupam largura total no telemóvel */
+            max-width: 250px;
         }
-        .btn:hover {
-            background-color: #1B5E20; /* Verde mais escuro ao passar o mouse */
-            transform: scale(1.05);
+        .btn-verde {
+            background-color: #2E7D32;
+            color: white;
+            box-shadow: 0 4px 10px rgba(46, 125, 50, 0.3);
         }
-        /* Botão de voltar (inicialmente escondido) */
-        #btn-voltar {
-            display: none;
-            background-color: #4CAF50;
+        .btn-verde:hover {
+            background-color: #1B5E20;
+            transform: scale(1.02);
         }
+        .btn-vermelho {
+            background-color: #fff;
+            color: #d32f2f;
+            border: 2px solid #ffebee;
+        }
+        .btn-vermelho:hover {
+            background-color: #ffebee;
+        }
+        .link-voltar {
+            display: block;
+            margin-top: 20px;
+            color: #888;
+            text-decoration: none;
+            font-size: 12px;
+        }
+        .link-voltar:hover { text-decoration: underline; }
 
-        /* Animação suave do sino */
         @keyframes balancar {
             0% { transform: rotate(0deg); }
             10% { transform: rotate(10deg); }
@@ -129,12 +168,18 @@
 
     <div class="container">
         <span class="emoji-sino">🔔</span>
-        <h1 id="status-texto">Ativar Notificações</h1>
-        <p id="status-desc">Receba as novidades da <strong>Educação Orindiuva</strong> diretamente no seu dispositivo.</p>
+        <h1 id="status-texto">A carregar...</h1>
+        <p id="status-desc">A verificar estado da subscrição.</p>
         
-        <button id="btn-ativar" class="btn" onclick="ativarNotificacoes()">Confirmar Inscrição</button>
+        <button id="btn-ativar" class="btn btn-verde" onclick="ativar()" style="display:none">
+            Confirmar Inscrição
+        </button>
         
-        <a id="btn-voltar" class="btn" href="https://educacao-orindiuva.github.io/">Voltar para o Site</a>
+        <button id="btn-desativar" class="btn btn-vermelho" onclick="desativar()" style="display:none">
+            Parar de receber
+        </button>
+
+        <a class="link-voltar" href="https://educacao-orindiuva.github.io/">Voltar ao site principal</a>
     </div>
 
 </body>
