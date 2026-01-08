@@ -5,56 +5,136 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Notificações Educação</title>
     
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
     <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
     <script>
       window.OneSignalDeferred = window.OneSignalDeferred || [];
       OneSignalDeferred.push(async function(OneSignal) {
         await OneSignal.init({
-          appId: "46cd0741-ba50-4de8-8648-a92336f6bcc2", // O teu ID
+          appId: "46cd0741-ba50-4de8-8648-a92336f6bcc2",
           notifyButton: {
-            enable: true, /* Ativa o sino no canto inferior direito */
-            size: 'medium',
-            theme: 'default',
-            position: 'bottom-right',
-            showCredit: false
+            enable: false, /* Desativamos o sino padrão pois já temos o nosso */
           },
           allowLocalhostAsSecureOrigin: true,
         });
+
+        // Verifica se o usuário já está inscrito ao carregar a página
+        if (OneSignal.User.PushSubscription.optedIn) {
+            atualizarParaInscrito();
+        }
+
+        // Fica ouvindo mudanças: se a pessoa aceitar, muda a tela automaticamente
+        OneSignal.User.PushSubscription.addEventListener("change", function(event) {
+            if (event.current.optedIn) {
+                atualizarParaInscrito();
+            }
+        });
       });
+
+      // Função chamada ao clicar no botão verde
+      function ativarNotificacoes() {
+        window.OneSignalDeferred.push(async function(OneSignal) {
+            await OneSignal.Slidedown.promptPush();
+        });
+      }
+
+      // Função que muda o visual quando está inscrito
+      function atualizarParaInscrito() {
+        document.getElementById("status-texto").innerText = "Notificações Ativadas!";
+        document.getElementById("status-desc").innerText = "Obrigado! Agora você receberá todos os avisos importantes.";
+        document.getElementById("btn-ativar").style.display = "none"; // Esconde botão ativar
+        document.getElementById("btn-voltar").style.display = "inline-block"; // Mostra botão voltar
+        document.querySelector(".emoji-sino").innerText = "✅"; // Muda sino para check
+        document.querySelector(".emoji-sino").style.animation = "none"; // Para a animação
+      }
     </script>
 
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Poppins', sans-serif;
+            background-color: #f4fdf4; /* Fundo muito levemente esverdeado */
             display: flex;
-            flex-direction: column;
-            align-items: center;
             justify-content: center;
+            align-items: center;
             height: 100vh;
             margin: 0;
-            background-color: #f4f6f8;
-            color: #333;
             text-align: center;
+            color: #2E7D32; /* Verde Escuro (Educação) */
         }
-        .card {
+        .container {
             background: white;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(46, 125, 50, 0.15); /* Sombra verde suave */
             max-width: 400px;
             width: 90%;
         }
-        h1 { font-size: 1.4rem; color: #007bff; margin-bottom: 10px; }
-        p { margin-bottom: 20px; line-height: 1.5; color: #555; }
-        .icon { font-size: 3rem; margin-bottom: 15px; }
+        .emoji-sino {
+            font-size: 80px;
+            margin-bottom: 20px;
+            display: block;
+            animation: balancar 2s infinite ease-in-out;
+            cursor: default;
+        }
+        h1 {
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+        p {
+            font-weight: 400;
+            margin-bottom: 30px;
+            color: #555; /* Cinza para leitura fácil */
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .btn {
+            background-color: #2E7D32; /* Verde Principal */
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            font-family: 'Poppins', sans-serif;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.2s;
+            text-decoration: none;
+            display: inline-block;
+            font-weight: 600;
+        }
+        .btn:hover {
+            background-color: #1B5E20; /* Verde mais escuro ao passar o mouse */
+            transform: scale(1.05);
+        }
+        /* Botão de voltar (inicialmente escondido) */
+        #btn-voltar {
+            display: none;
+            background-color: #4CAF50;
+        }
+
+        /* Animação suave do sino */
+        @keyframes balancar {
+            0% { transform: rotate(0deg); }
+            10% { transform: rotate(10deg); }
+            20% { transform: rotate(-10deg); }
+            30% { transform: rotate(6deg); }
+            40% { transform: rotate(-6deg); }
+            50% { transform: rotate(0deg); }
+            100% { transform: rotate(0deg); }
+        }
     </style>
 </head>
 <body>
 
-    <div class="card">
-        <div class="icon">📢</div>
-        <h1>Central de Notificações</h1>
-        <p>Para receber avisos importantes da Educação, clique no <strong>sino vermelho/branco</strong> no canto do ecrã e selecione <strong>"Inscrever-se"</strong>.</p>
+    <div class="container">
+        <span class="emoji-sino">🔔</span>
+        <h1 id="status-texto">Ativar Notificações</h1>
+        <p id="status-desc">Receba as novidades da <strong>Educação Orindiuva</strong> diretamente no seu dispositivo.</p>
+        
+        <button id="btn-ativar" class="btn" onclick="ativarNotificacoes()">Confirmar Inscrição</button>
+        
+        <a id="btn-voltar" class="btn" href="https://educacao-orindiuva.github.io/">Voltar para o Site</a>
     </div>
 
 </body>
